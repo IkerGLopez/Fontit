@@ -1,0 +1,24 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700&family=Space+Grotesk:wght@400;500;700&display=swap");
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    color: #1c1917;
+  }
+
+  body {
+    font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+    @apply m-0 min-h-screen bg-[linear-gradient(160deg,#fff7ed_0%,#fefce8_35%,#f0fdfa_100%)] text-stone-900 antialiased;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: "Fraunces", Georgia, serif;
+    font-variation-settings: "SOFT" 70, "WONK" 1;
+  }
+}

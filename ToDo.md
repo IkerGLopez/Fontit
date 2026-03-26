@@ -1,0 +1,6 @@
+- Quitar emoticonos de las respuestas.
+- Que lo que responda sea una serie de fuentes pero no una respuesta larga, sino:
+    - Un componente que muestre la fuente con un texto de ejemplo.
+    - La posibilidad de poner el texto que prefieras y se vea como muestra.
+    - Poder descargar la fuente con un botón de download.
+- Coger una API de fuentes (la de Google puede ser buena opción, pero buscar más).
