@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
-import { getModelName, openrouter } from "../services/openRouterClient.js";
+import { getModelName, groq } from "../services/groqClient.js";
 import { evaluateChatPromptPolicy } from "../utils/chatPromptPolicy.js";
 import { validateChatInput } from "../utils/sanitizeChatInput.js";
 import { parseAndValidateStructuredRecommendation } from "../utils/structuredRecommendation.js";
@@ -74,11 +74,19 @@ const splitInChunks = (text, chunkSize) => {
 };
 
 const requestModelCompletion = async ({ prompt, timeoutMs, systemPrompt = SYSTEM_PROMPT }) => {
-  const stream = await openrouter.chat.send(
-    {
-      chatGenerationParams: {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const stream = await groq.chat.completions.create(
+      {
         model: getModelName(),
         stream: true,
+        temperature: 1,
+        max_completion_tokens: 8192,
+        top_p: 1,
+        stop: null,
+        reasoning_effort: "medium",
         messages: [
           {
             role: "system",
@@ -90,30 +98,35 @@ const requestModelCompletion = async ({ prompt, timeoutMs, systemPrompt = SYSTEM
           },
         ],
       },
-    },
-    {
-      timeoutMs,
-    },
-  );
+      {
+        signal: controller.signal,
+      }
+    );
 
-  let text = "";
-  let reasoningTokens = 0;
+    let text = "";
+    let reasoningTokens = 0;
 
-  for await (const chunk of stream) {
-    const token = chunk.choices?.[0]?.delta?.content;
-    if (token) {
-      text += token;
+    for await (const chunk of stream) {
+      const token = chunk.choices?.[0]?.delta?.content;
+      if (token) {
+        text += token;
+      }
+      // Groq does not currently send reasoningTokens in the same format OpenRouter does,
+      // but we handle it just in case:
+      if (chunk.usage?.reasoningTokens) {
+        reasoningTokens = chunk.usage.reasoningTokens;
+      }
     }
 
-    if (chunk.usage?.reasoningTokens) {
-      reasoningTokens = chunk.usage.reasoningTokens;
-    }
+    clearTimeout(timeoutId);
+    return {
+      text,
+      reasoningTokens,
+    };
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
   }
-
-  return {
-    text,
-    reasoningTokens,
-  };
 };
 
 const buildUserPrompt = ({ message, contextBlock, correctionHint = "" }) => {
@@ -174,7 +187,7 @@ chatRouter.post("/stream", async (req, res) => {
     });
   }
 
-  const timeoutMs = Number(process.env.OPENROUTER_TIMEOUT_MS || 45000);
+  const timeoutMs = Number(process.env.GROQ_TIMEOUT_MS || 12000);
   const totalTimeoutMs = readTotalTimeoutMs();
 
   let retrievedContext;

@@ -7,7 +7,7 @@ Express backend that proxies AI calls, validates responses, and streams structur
 - Protect API keys from the client.
 - Validate and sanitize chat input.
 - Retrieve typography context (RAG-lite).
-- Call OpenRouter with streaming enabled.
+- Call Groq with streaming enabled.
 - Repair malformed JSON via a second AI pass.
 - Stream SSE events to the frontend.
 - Expose font catalog endpoints.
@@ -17,7 +17,7 @@ Express backend that proxies AI calls, validates responses, and streams structur
 
 - Node.js (ESM)
 - Express 5
-- @openrouter/sdk
+- groq-sdk
 - dotenv
 - cors
 
@@ -48,9 +48,9 @@ This behavior is implemented in src/server.js.
 
 ## Environment variables
 
-- OPENROUTER_API_KEY: required for chat endpoint.
-- OPENROUTER_MODEL: model id (default openrouter/free).
-- OPENROUTER_TIMEOUT_MS: timeout for model requests (ms).
+- GROQ_API_KEY: required for chat endpoint.
+- GROQ_MODEL: model id (default openai/gpt-oss-20b).
+- GROQ_TIMEOUT_MS: timeout for model requests (ms).
 - CHAT_MAX_MODEL_ATTEMPTS: max generation attempts before returning format error.
 - PORT: HTTP port.
 - CORS_ORIGINS: comma-separated list of allowed origins.
@@ -137,7 +137,7 @@ backend/
       fonts.js
       knowledge.js
     services/
-      openRouterClient.js
+      groqClient.js
       fonts/
       knowledge/
     utils/
@@ -158,9 +158,9 @@ backend/
 
 ## Troubleshooting
 
-### OPENROUTER_API_KEY warning
+### GROQ_API_KEY warning
 
-If you see OPENROUTER_API_KEY is not set:
+If you see GROQ_API_KEY is not set:
 
 - Ensure .env exists at root or backend/.env.
 - Ensure backend restarted after changing .env.
@@ -177,7 +177,7 @@ If you see fallback to embedded font catalog:
 If chat ends with format error:
 
 - Increase CHAT_MAX_MODEL_ATTEMPTS moderately.
-- Review model selection in OPENROUTER_MODEL.
+- Review model selection in GROQ_MODEL.
 - Check logs for repairUsed and attempt count.
 
 ## Related docs

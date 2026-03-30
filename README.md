@@ -17,7 +17,7 @@ hackaton-cubepath/
 
 - Package manager: pnpm only
 - Frontend: React, Vite, Tailwind CSS
-- Backend: Node.js, Express, OpenRouter SDK
+- Backend: Node.js, Express, Groq SDK
 - Streaming: Server-Sent Events (SSE)
 
 ## Features
@@ -55,8 +55,8 @@ cp .env.example .env
 
 3. Fill required variables in .env:
 
-- OPENROUTER_API_KEY
-- OPENROUTER_MODEL (optional override)
+- GROQ_API_KEY
+- GROQ_MODEL (optional override)
 - GOOGLE_FONTS_API_KEY (recommended)
 
 4. Run frontend and backend together:
@@ -81,9 +81,9 @@ Use .env.example as source of truth.
 
 ### Backend
 
-- OPENROUTER_API_KEY: OpenRouter API key.
-- OPENROUTER_MODEL: model id (default openrouter/free).
-- OPENROUTER_TIMEOUT_MS: timeout per model request.
+- GROQ_API_KEY: Groq API key.
+- GROQ_MODEL: model id (default openai/gpt-oss-20b).
+- GROQ_TIMEOUT_MS: timeout per model request.
 - CHAT_MAX_MODEL_ATTEMPTS: max generation attempts before error.
 - PORT: backend port.
 - CORS_ORIGINS: comma-separated allowlist.
